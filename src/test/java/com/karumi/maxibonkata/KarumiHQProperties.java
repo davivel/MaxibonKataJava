@@ -6,6 +6,8 @@ import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
 import org.junit.runner.RunWith;
 
+import java.util.List;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -23,6 +25,17 @@ public class KarumiHQProperties {
 
         KarumiHQs hq = new KarumiHQs();
         hq.openFridge(developer);
+
+        assertTrue(hq.getMaxibonsLeft() > 2);
+    }
+
+    @Property public void theNumberOfMaxibonsIsGreaterThanTwo(
+        List<@From(DevelopersGenerator.class) Developer> developers
+    ) {
+        System.out.println("-----------------> " + developers.size());
+
+        KarumiHQs hq = new KarumiHQs();
+        hq.openFridge(developers);
 
         assertTrue(hq.getMaxibonsLeft() > 2);
     }
