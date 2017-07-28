@@ -22,7 +22,16 @@ public class DeveloperProperties {
         System.out.println("-----------------> " + numberOfMaxibons);
 
         Developer developer = new Developer(ANY_NAME, numberOfMaxibons);
+
         assertTrue(developer.getNumberOfMaxibonsToGrab() >= 0);
+    }
+
+    @Property public void theNameIsNotMutatedInConstruction(String name) {
+        System.out.println("-----------------> " + name);
+
+        Developer developer = new Developer(name, ANY_NUMBER_OF_MAXIBONS);
+
+        assertTrue(developer.getName().equals(name));
     }
 
 }
