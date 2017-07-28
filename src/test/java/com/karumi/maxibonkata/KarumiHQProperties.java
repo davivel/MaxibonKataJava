@@ -5,17 +5,19 @@ import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
 
 /**
  * Created by David A. Velasco on 28/7/17.
@@ -28,7 +30,10 @@ public class KarumiHQProperties {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        karumiHQs = new KarumiHQs(chat);
     }
+
+    KarumiHQs karumiHQs;
 
     @Mock
     Chat chat;
@@ -38,10 +43,9 @@ public class KarumiHQProperties {
     ) {
         System.out.println("-----------------> " + developer);
 
-        KarumiHQs hq = new KarumiHQs();
-        hq.openFridge(developer);
+        karumiHQs.openFridge(developer);
 
-        assertTrue(hq.getMaxibonsLeft() > 2);
+        assertTrue(karumiHQs.getMaxibonsLeft() > 2);
     }
 
     @Property public void theNumberOfMaxibonsIsGreaterThanTwoGroup(
@@ -49,10 +53,9 @@ public class KarumiHQProperties {
     ) {
         System.out.println("-----------------> " + developers.size());
 
-        KarumiHQs hq = new KarumiHQs();
-        hq.openFridge(developers);
+        karumiHQs.openFridge(developers);
 
-        assertTrue(hq.getMaxibonsLeft() > 2);
+        assertTrue(karumiHQs.getMaxibonsLeft() > 2);
     }
 
     @Property public void aMessageIsSentThroughChatEverytimeTheNumberOfMaxibonsIsBelowTwo(
@@ -60,8 +63,7 @@ public class KarumiHQProperties {
     ) {
         System.out.println("-----------------> " + developer);
 
-        KarumiHQs hq = new KarumiHQs(chat);
-        hq.openFridge(developer);
+        karumiHQs.openFridge(developer);
 
         verify(chat).sendMessage("Hi guys, I'm " + developer.getName() + ". We need more maxibons!");
     }
@@ -72,13 +74,65 @@ public class KarumiHQProperties {
     ) {
         System.out.println("-----------------> " + developers.size());
 
-        KarumiHQs hq = new KarumiHQs(chat);
-        hq.openFridge(developers);
+        karumiHQs.openFridge(developers);
 
         verify(chat, atLeastOnce()).sendMessage(anyString());
     }
     */
 
 
+    @Property public void aMessageIsNeverSentIfTheNumberOfMaxibonsIsGreaterThanTwo(
+        @From(NotSoHungryDevelopersGenerator.class) Developer developer
+    ) {
+        System.out.println("-----------------> " + developer);
 
+        karumiHQs.openFridge(developer);
+
+        verify(chat, never()).sendMessage(anyString());
+    }
+
+    @Test
+    public void shouldBe7LeftWhenPedroOpensTheFridge() {
+        Developer developer = Karumies.PEDRO;
+
+        karumiHQs.openFridge(developer);
+
+        assertEquals(7, karumiHQs.getMaxibonsLeft());
+    }
+
+    @Test
+    public void shouldBeLeft12WhenJorgeGrabs8() {
+        Developer developer = new Developer(Karumies.JORGE.getName(), 8);
+
+        karumiHQs.openFridge(developer);
+
+        assertEquals(12, karumiHQs.getMaxibonsLeft());
+    }
+
+    @Test
+    public void shouldBeLeft3WhenAlbertoGrabs7() {
+        Developer developer = new Developer(Karumies.ALBERTO.getName(), 7);
+
+        karumiHQs.openFridge(developer);
+
+        assertEquals(3, karumiHQs.getMaxibonsLeft());
+    }
+
+    @Test
+    public void shouldBeLeft10WhenDavideGrabs0() {
+        Developer developer = Karumies.DAVIDE;
+
+        karumiHQs.openFridge(developer);
+
+        assertEquals(10, karumiHQs.getMaxibonsLeft());
+    }
+
+    @Test
+    public void shouldBeLeft10WhenSergioGrabs10() {
+        Developer developer = new Developer(Karumies.SERGIO.getName(), 10);
+
+        karumiHQs.openFridge(developer);
+
+        assertEquals(10, karumiHQs.getMaxibonsLeft());
+    }
 }
